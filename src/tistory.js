@@ -74,7 +74,7 @@ var fs = require('fs');
         
         const gatsbyMarkdown = 
 `---
-title: '${post.title}'
+title: '${post.title.replace(/'/gi,"\"")}'
 date: 2022-04-22 16:21:13
 category: 'dev'
 draft: false
@@ -99,10 +99,10 @@ ${markdown}
 
 /*
 ---
-title: 'Category Test1'
-date: 2020-07-02 16:21:13
-category: 'category1'
-draft: false
+title:'Category Test1'
+date:2020-07-02 16:21:13
+category:'category1'
+draft:false
 ---
 
 Test1
