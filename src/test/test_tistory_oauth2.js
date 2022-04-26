@@ -89,10 +89,15 @@ function sleep(t){
         }
     } while (listRes.data.tistory.item.posts != undefined);
     
+
+    for( const [ idx, post]  of tistoryPosts.entries()){
+        console.log(idx,post);
+        const readUrl = `https://www.tistory.com/apis/post/read?blogName=${blogName}&postId=${post.id}&access_token=${access_token}&output=json`;
+        console.log(readUrl);
+        const readRes = await axios.get(readUrl);
+        console.log(readRes);
+    }
     
-    const readUrl = `https://www.tistory.com/apis/post/read?blogName=${blogName}&postId=575&access_token=${access_token}&output=json`;
-    console.log(readUrl);
-    const readRes = await axios.get(readUrl);
-    console.log(readRes);
+    
     console.log("debugger");
 })();
