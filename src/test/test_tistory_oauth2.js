@@ -1,14 +1,41 @@
 const axios = require("axios").default;
-const cheerio = require("cheerio");
 const webdriver = require('selenium-webdriver');
 const { By } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
+const TurndownService = require('turndown');
+const turndownService = new TurndownService();
+turndownService.remove("script");
+const fs = require('fs/promises');
+const path = require('path');
 
 require("dotenv").config();
 
 function sleep(t){
     console.log(t+"ms sleep.");
     return new Promise(resolve=>setTimeout(resolve,t));
+}
+
+async function isExists(path) {
+    try {
+        await fs.access(path);
+        return true;
+    } catch {
+        return false;
+    }
+};
+  
+async function writeFile(filePath, data) {
+    try {
+        const dirname = path.dirname(filePath);
+        const exist = await isExists(dirname);
+        if (!exist) {
+        await fs.mkdir(dirname, {recursive: true});
+        }
+        
+        await fs.writeFile(filePath, data, 'utf8');
+    } catch (err) {
+        throw new Error(err);
+    }
 }
 
 (async () => {
@@ -77,6 +104,15 @@ function sleep(t){
     
 
     const blogName = 'nhj12311';
+
+
+    const categoryUrl = `https://www.tistory.com/apis/category/list?access_token=${access_token}&output=json&blogName=${blogName}`;
+    const categoryRes = await axios.get(categoryUrl);
+    const categories = categoryRes.data.tistory.item.categories;
+    console.log(categoryRes);
+    const categoryMap = categories.reduce((map, obj) => { map.set(obj.id, obj); return map; }, new Map); 
+    console.log(categoryMap);
+
     let page_number = 1;
     let listRes = {};
     let tistoryPosts = [];
@@ -92,12 +128,34 @@ function sleep(t){
 
     for( const [ idx, post]  of tistoryPosts.entries()){
         console.log(idx,post);
+        if( categoryMap.get(post.categoryId).label.indexOf("dev") == -1){
+            continue;
+        }
+        const categoryName = categoryMap.get(post.categoryId).name;
         const readUrl = `https://www.tistory.com/apis/post/read?blogName=${blogName}&postId=${post.id}&access_token=${access_token}&output=json`;
-        console.log(readUrl);
+        
         const readRes = await axios.get(readUrl);
-        console.log(readRes);
-    }
+        
+
+        const markdown = turndownService.turndown(readRes.data.tistory.item.content);
+        console.log(markdown);
+
+        const gatsbyMarkdown = 
+`---
+title: '${post.title.replace(/'/gi,"\"")}'
+date: ${post.date}
+category: '${categoryName}'
+draft: false
+---
+
+${markdown}
+`;
+        
+        const fileName = "./target/"+ categoryName + "/" + post.id + ".md";
+        await writeFile(fileName,gatsbyMarkdown);
+    } // end for( const [ idx, post]  of tistoryPosts.entries()){ 
     
     
+
     console.log("debugger");
 })();
