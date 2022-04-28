@@ -1,7 +1,36 @@
+
+console.log(process.env.NODE_TLS_REJECT_UNAUTHORIZED);
+
+
 const nhm = require('node-html-markdown');
 
 const axios = require("axios").default;
 const cheerio = require("cheerio");
+const fs = require('fs/promises');
+const path = require('path');
+
+async function isExists(path) {
+    try {
+        await fs.access(path);
+        return true;
+    } catch {
+        return false;
+    }
+};
+  
+async function writeFile(filePath, data) {
+    try {
+        const dirname = path.dirname(filePath);
+        const exist = await isExists(dirname);
+        if (!exist) {
+        await fs.mkdir(dirname, {recursive: true});
+        }
+        
+        await fs.writeFile(filePath, data, 'utf8');
+    } catch (err) {
+        throw new Error(err);
+    }
+}
 
 (async () => {
     const response = await axios.get(`https://nhj12311.tistory.com/575`);
@@ -10,7 +39,9 @@ const cheerio = require("cheerio");
     const TurndownService = require('turndown');
     const turndownService = new TurndownService();
     turndownService.remove("script");
-    turndownService.keep(['table'])
+    //turndownService.remove("figure");
+    
+    turndownService.keep(['table','figure'])
 
     // Import plugins from turndown-plugin-gfm
     var turndownPluginGfm = require('turndown-plugin-gfm')
@@ -22,7 +53,7 @@ const cheerio = require("cheerio");
     //turndownService.use(gfm)
 
     // Use the table and strikethrough plugins only
-    //turndownService.use([tables])
+    turndownService.use([tables])
 
 
     $(".container_postbtn").remove();
@@ -31,9 +62,13 @@ const cheerio = require("cheerio");
      
     console.log(html);
 
+    await writeFile("./target/html.html", html);
+
     const markdown = turndownService.turndown(html);
     
-    //console.log(markdown);
+    console.log(markdown);
+
+    await writeFile("./target/turndown.md", markdown);
 
 
     const markdown2 = nhm.NodeHtmlMarkdown.translate(
@@ -43,7 +78,7 @@ const cheerio = require("cheerio");
         /* customCodeBlockTranslators (optional) */ undefined
     );
     console.log(markdown2);
-    
+    await writeFile("./target/NodeHtmlMarkdown.md", markdown2);
 
 
     console.log("");
