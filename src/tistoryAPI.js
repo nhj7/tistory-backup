@@ -1,4 +1,5 @@
 const axios = require("axios").default;
+const cheerio = require("cheerio");
 const webdriver = require('selenium-webdriver');
 const { By } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
@@ -47,7 +48,7 @@ async function writeFile(filePath, data) {
     {
 
         const chromeOptions   = new chrome.Options();
-        //chromeOptions.addArguments('--headless');
+        chromeOptions.addArguments('--headless');
 
         // 1. chromedriver 경로 설정 // chromedriver가 있는 경로를 입력 
         const service = new chrome.ServiceBuilder('./chromedriver/win32/chromedriver.exe').build(); 
@@ -130,10 +131,13 @@ async function writeFile(filePath, data) {
 
     for( const [ idx, post]  of tistoryPosts.entries()){
         console.log(idx,post);
-        if( categoryMap.get(post.categoryId).label.indexOf("dev") == -1){
-            continue;
-        }
-        const categoryName = categoryMap.get(post.categoryId).name;
+
+        // if( categoryMap.get(post.categoryId).label.indexOf("dev") == -1){
+        //     continue;
+        // }
+
+        const categoryName = categoryMap.get(post.categoryId)?.name || '없음';
+        const parentCategoryName = categoryMap.get(categoryMap.get(post.categoryId)?.parent)?.name || '';
         const readUrl = `https://www.tistory.com/apis/post/read?blogName=${blogName}&postId=${post.id}&access_token=${access_token}&output=json`;
         
         const readRes = await axios.get(readUrl);
@@ -153,7 +157,7 @@ draft: false
 ${markdown}
 `;
         
-        const fileName = "./target/"+ categoryName + "/" + post.id + ".md";
+        const fileName = `./target/${blogName}/${parentCategoryName}/${categoryName}/${post.id}.md`;
         await writeFile(fileName,gatsbyMarkdown);
     } // end for( const [ idx, post]  of tistoryPosts.entries()){ 
     

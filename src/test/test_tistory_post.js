@@ -32,6 +32,8 @@ async function writeFile(filePath, data) {
     }
 }
 
+const url = require("url");
+
 (async () => {
     const response = await axios.get(`https://nhj12311.tistory.com/575`);
     const $ = cheerio.load(response.data);
@@ -58,8 +60,82 @@ async function writeFile(filePath, data) {
 
     $(".container_postbtn").remove();
     //$("script").remove();
-    const html = $(".tt_article_useless_p_margin").html();
-     
+    const _html = $(".tt_article_useless_p_margin").html();
+    
+    const $html = cheerio.load(_html);
+
+    const style1 = $("link");
+    const arrCSS = [];
+    for(let i = 0; i < style1.length;i++){        
+        const el = style1[i];
+        console.log(i, el);
+        if( el.attribs.rel != 'stylesheet' ){
+            console.log("style1 not stylesheet");
+            continue;
+        }
+        try {
+
+            const style1Url = (el.attribs.href.startsWith("//")?'http:':'') + el.attribs.href;
+            const resStyle1 = await axios({
+                method : 'GET',
+                url : style1Url,
+                responseType: 'stream',
+            });
+    
+            const parsed = url.parse(style1Url);
+            const style1FileName = `${i} - ${path.basename(parsed.pathname)}`;
+            console.log(style1FileName);
+            arrCSS.push(style1FileName);
+            $html('head').append(`<link rel="stylesheet" href="./${style1FileName}">`);
+            await writeFile(`./target/${style1FileName}`, resStyle1.data);
+        } catch (error) {
+            console.error(error, el.attribs.href);            
+        }
+        
+    }
+
+
+    const arrImg = $html("img");
+    console.log(arrImg);
+
+    for(let i = 0; i < arrImg.length;i++){
+        const el = arrImg[i];
+        console.log(i, el);
+        const resImg = await axios({
+            method : 'GET',
+            url : el.attribs.src,
+            responseType: 'stream',
+        });
+        console.log(i, el, path.extname(el.attribs.src),resImg);
+        await writeFile(`./target/${i}.${path.extname(el.attribs.src)}`, resImg.data);        
+    }
+
+    $html("img").replaceWith((i, el) => {
+        console.log(i, el);
+
+        // const resImg = await axios({
+        //     method : 'GET',
+        //     url : el.attribs.src,
+        //     responseType: 'stream',
+        // });
+        // console.log(i, el, path.extname(el.attribs.src),resImg);
+        const imgFileName = `./${i}${path.extname(el.attribs.src)}`;
+        // await writeFile(`./target/${imgFileName}`, resImg.data);
+
+        return $html(el).attr('src', `${imgFileName}`)
+    });
+
+    console.log($html.html());
+
+
+    $html("body").prepend(`<p> <h1>${'Log4J(Log4Shell) 역대 최악 보안 취약점(CVE-2021-44228)'} </h1> </p><br /><br />`)
+
+    const html = $html.html();
+
+
+
+    console.log("");
+
     console.log(html);
 
     await writeFile("./target/html.html", html);
