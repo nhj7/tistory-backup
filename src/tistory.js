@@ -13,6 +13,8 @@ const path = require('path');
 
 require("dotenv").config();
 
+const htmlGen = require("./tistory/HTML_Generator.js")
+
 function sleep(t){
     console.log(t+"ms sleep.");
     return new Promise(resolve=>setTimeout(resolve,t));
@@ -108,6 +110,11 @@ async function writeFile(filePath, data) {
 
     const blogName = 'nhj12311';
 
+    await writeFile(`./target/${blogName}/index.html`,htmlGen.get_index_html(blogName));    // make index.html
+
+
+    
+
 
     const categoryUrl = `https://www.tistory.com/apis/category/list?access_token=${access_token}&output=json&blogName=${blogName}`;
     const categoryRes = await axios.get(categoryUrl);
@@ -115,6 +122,8 @@ async function writeFile(filePath, data) {
     console.log(categoryRes);
     const categoryMap = categories.reduce((map, obj) => { map.set(obj.id, obj); return map; }, new Map); 
     console.log(categoryMap);
+
+    await writeFile(`./target/${blogName}/category-frame.html`,htmlGen.get_category_frame_html(blogName, categoryMap)); // make category frame
 
     let page_number = 1;
     let listRes = {};
@@ -127,7 +136,9 @@ async function writeFile(filePath, data) {
             tistoryPosts = [ ...tistoryPosts, ...listRes.data.tistory.item.posts];
         }
     } while (listRes.data.tistory.item.posts != undefined);
-    
+
+    // make allposts-frame.html
+    await writeFile(`./target/${blogName}/allposts-frame.html`,htmlGen.get_allposts_frame_html(blogName, categoryMap, tistoryPosts)); // make all posts frame.
 
     for( const [ idx, post]  of tistoryPosts.entries()){
         console.log(idx,post);
@@ -145,6 +156,8 @@ async function writeFile(filePath, data) {
         const $ = cheerio.load(readRes.data.tistory.item.content);
 
         const filePath = `./target/${blogName}/${parentCategoryName}/${categoryName}/${post.id}`
+        
+        
 
         // download post images
         {
@@ -200,11 +213,13 @@ ${markdown}
         const htmlFileName = `${filePath}/${post.id}.html`;
         await writeFile(markdownFileName,gatsbyMarkdown);
 
-
         $("body").prepend(`<p><h4 style='text-align:center;' >#${categoryName}</h4> <h1 style='text-align:center;'> ${post.title} </h1> </center> </p> <p style='text-align:right;' > ${post.date} </p> <br /> <hr /> <br />`)
 
         await writeFile(htmlFileName,$.html());
     } // end for( const [ idx, post]  of tistoryPosts.entries()){ 
+    
+    
+
     
     
 
