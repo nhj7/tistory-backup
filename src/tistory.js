@@ -43,7 +43,7 @@ async function writeFile(filePath, data) {
     }
 }
 
-(async () => {
+(async (blogName) => {
 
     // get tistory api access_token oauth 2.0
     let access_token = '';    
@@ -106,24 +106,21 @@ async function writeFile(filePath, data) {
         }
         access_token = _access_token.data.access_token;
     }
-    
 
-    const blogName = 'nhj12311';
-
-    await writeFile(`./target/${blogName}/index.html`,htmlGen.get_index_html(blogName));    // make index.html
+    // create index.html
+    await writeFile(`./target/${blogName}/index.html`,htmlGen.get_index_html(blogName));    
 
 
-    
-
-
+    // get blog category info
     const categoryUrl = `https://www.tistory.com/apis/category/list?access_token=${access_token}&output=json&blogName=${blogName}`;
     const categoryRes = await axios.get(categoryUrl);
     const categories = categoryRes.data.tistory.item.categories;
     console.log(categoryRes);
-    const categoryMap = categories.reduce((map, obj) => { map.set(obj.id, obj); return map; }, new Map); 
+    const categoryMap = categories ? categories.reduce((map, obj) => { map.set(obj.id, obj); return map; }, new Map) : new Map();
     console.log(categoryMap);
 
-    await writeFile(`./target/${blogName}/category-frame.html`,htmlGen.get_category_frame_html(blogName, categoryMap)); // make category frame
+    // create category-frame.html
+    await writeFile(`./target/${blogName}/category-frame.html`,htmlGen.get_category_frame_html(blogName, categoryMap)); 
 
     let page_number = 1;
     let listRes = {};
@@ -140,6 +137,52 @@ async function writeFile(filePath, data) {
     // make allposts-frame.html
     await writeFile(`./target/${blogName}/allposts-frame.html`,htmlGen.get_allposts_frame_html(blogName, categoryMap, tistoryPosts)); // make all posts frame.
 
+
+    // get css
+    const url = require("url");
+    const arrCSS = [];
+    if( tistoryPosts.length > 0 ){
+        const response = await axios.get(`https://${blogName}.tistory.com/${tistoryPosts[0].id}`);
+        const $ = cheerio.load(response.data);
+        const style1 = $("link");
+        
+        for(let i = 0; i < style1.length;i++){        
+            const el = style1[i];
+            console.log(i, el);
+            if( el.attribs.rel != 'stylesheet' ){
+                console.log("style1 not stylesheet");
+                continue;
+            }
+            try {
+
+                const style1Url = (el.attribs.href.startsWith("//")?'http:':'') + el.attribs.href;
+                const resStyle1 = await axios({
+                    method : 'GET',
+                    url : style1Url,
+                    responseType: 'stream',
+                });
+        
+                const parsed = url.parse(style1Url);
+                const style1FileName = `${i} - ${path.basename(parsed.pathname)}`;
+                console.log(style1FileName);
+                arrCSS.push(style1FileName);
+
+                
+
+                const cssFile = `./target/${blogName}/${style1FileName}`;
+                
+                await writeFile(cssFile, resStyle1.data);
+                const readFile = await fs.readFile(cssFile, 'utf8');
+                
+                await writeFile(cssFile, readFile.replace(/url\(\/\//g, 'url(http://'));
+            } catch (error) {
+                console.error(error, el.attribs.href);            
+            }
+            
+        }
+    }
+
+    // create post html, download post images
     for( const [ idx, post]  of tistoryPosts.entries()){
         console.log(idx,post);
 
@@ -153,7 +196,14 @@ async function writeFile(filePath, data) {
         
         const readRes = await axios.get(readUrl);
 
-        const $ = cheerio.load(readRes.data.tistory.item.content);
+        const $ = cheerio.load(
+`<div class="skin_view" style="height: auto !important;">
+<div class='area_title'> <h4 class='tit_category' >${categoryName}</h4> <h1 class='tit_post'> ${post.title} </h1> <p class='tit_sub' > ${post.date} </p> </div>
+<div class="area_view">
+<div class="tt_article_useless_p_margin contents_style">`
+            +readRes.data.tistory.item.content + 
+            `</div></div></div>`
+        );
 
         const filePath = `./target/${blogName}/${parentCategoryName}/${categoryName}/${post.id}`
         
@@ -213,7 +263,32 @@ ${markdown}
         const htmlFileName = `${filePath}/${post.id}.html`;
         await writeFile(markdownFileName,gatsbyMarkdown);
 
-        $("body").prepend(`<p><h4 style='text-align:center;' >#${categoryName}</h4> <h1 style='text-align:center;'> ${post.title} </h1> </center> </p> <p style='text-align:right;' > ${post.date} </p> <br /> <hr /> <br />`)
+        arrCSS.forEach(
+            (cssFileName, idx ) => {
+                if( cssFileName.indexOf("googleapis")>-1){
+                    return;
+                }
+                $('head').append(`<link rel="stylesheet" href="../../${parentCategoryName?"../":""}${cssFileName}">`);
+            }
+        );
+
+        const hljs_Ver = '11.5.1';
+        $('body').append(`<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${hljs_Ver}/styles/vs2015.min.css">`);
+        
+        $('body').append(`<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${hljs_Ver}/highlight.min.js"></script>`);
+        $('body').append(`<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${hljs_Ver}/languages/kotlin.min.js"></script>`);
+        $('body').append(`<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${hljs_Ver}/languages/swift.min.js"></script>`);
+        $('body').append(`<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${hljs_Ver}/languages/go.min.js"></script>`);
+        $('body').append(`<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${hljs_Ver}/languages/scala.min.js"></script>`);
+        $('body').append(`<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/${hljs_Ver}/languages/r.min.js"></script>`);
+        $('body').append(`<script>hljs.initHighlightingOnLoad();</script>`);
+
+        $('body').attr("style", "padding:3em 7em 7em 7em;");
+
+
+        
+
+        //$("body").prepend(`<p><h4 style='text-align:center;' >#${categoryName}</h4> <h1 style='text-align:center;'> ${post.title} </h1> </center> </p> <p style='text-align:right;' > ${post.date} </p> <br /> <hr /> <br />`)
 
         await writeFile(htmlFileName,$.html());
     } // end for( const [ idx, post]  of tistoryPosts.entries()){ 
@@ -224,4 +299,4 @@ ${markdown}
     
 
     console.log("debugger");
-})();
+})('nhj12311');
