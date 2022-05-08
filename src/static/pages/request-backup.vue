@@ -54,7 +54,7 @@
 </template>
 <script>
   module.exports = {
-    name: 'search',
+    name: 'backup',
     data: function () {
       return {
         exTistoryID : 'nhj12311'

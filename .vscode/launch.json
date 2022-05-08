@@ -17,7 +17,7 @@
             "type": "node",
             "name": "Debug (Launch) - Current File",
             "request": "launch",
-            "program": "${file}",
+            "program": "--watch ${file}",
             "env": {
                 "NODE_TLS_REJECT_UNAUTHORIZED": "0"
             }

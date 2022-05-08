@@ -16,7 +16,11 @@ decorateReply: false // the reply decorator has been added by the first plugin r
 })
 
 fastify.get('/api/requestBackup', function (req, reply) {
-    return `Hello World` // sending path.join(__dirname, 'public', 'myHtml.html') directly with custom filename
+    return `echo requestBackup` // sending path.join(__dirname, 'public', 'myHtml.html') directly with custom filename
+})
+
+fastify.get('/api/request-list', function (req, reply) {
+    return `echo request-list` // sending path.join(__dirname, 'public', 'myHtml.html') directly with custom filename
 })
 
 

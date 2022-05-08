@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tistory Backup</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style>
         
     </style>
 </head>
 <body>
-
+<div id="app">
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Tistory Backup</a>
@@ -22,8 +22,18 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+                <router-link class="nav-link active" to="/">Home </router-link>
             </li>
+            <li class="nav-item">
+                <router-link class="nav-link active" to="/request-backup">백업요청</router-link>
+            </li>
+            <li class="nav-item">
+                <router-link class="nav-link active" to="/request-id/123">동적 라우터 예제</router-link>
+            </li>
+            <li class="nav-item">
+                <router-link class="nav-link active" :to="{name: 'request-params', params: {name: 'dog', age:4}}">파라미터 예제</router-link>
+            </li>
+
             <!--li class="nav-item">
             <a class="nav-link" href="#">Link</a>
             </li>
@@ -50,9 +60,19 @@
     </div>
 </nav>
 
-<div id="app" class="container">
-    <component :is="currentView"></component>
-</div> <!--<div id="app" class="container"> -->
+<div  class="container">
+    <!--component :is="currentView"></component-->
+
+    <router-view></router-view>
+
+</div> <!--<div class="container"> -->
+
+    <br /><br /><br />
+    <router-link to="/">Go to Home {{exTistoryID}} </router-link>
+
+
+</div> <!--<div id="app"> -->
+
 <!-- JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 
@@ -66,21 +86,42 @@
     ReactDOM.render(<h4>백업하고 싶은 티스토리 아이디와 받고 싶은 메일 주소를 적어주세요 🚀</h4>, app);
 </script-->
 <!-- 상용버전, 속도와 용량이 최적화됨. -->
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 <script src="https://unpkg.com/http-vue-loader"></script>
-
+<script src="https://unpkg.com/vue-router@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+    // 1. Define route components.
+    // These can be imported from other files
+    
+    const REUQEST_LIST = httpVueLoader('./pages/request-list.vue')
+    const REUQEST_BACKUP = httpVueLoader('./pages/request-backup.vue')
+    const REUQEST_ID = {template : `<div>User {{ $route.params.id }}</div>`};
+    const REUQEST_PARAMS = {template : `<div>PARAMS {{ $route.params }}</div>`};
+    const routes = [
+        { path: '/', component: REUQEST_LIST },
+        { path: '/request-list', component: REUQEST_LIST },
+        { path: '/request-backup', component: REUQEST_BACKUP },
+        { path: '/request-id/:id', component: REUQEST_ID },
+        { path: '/request-params', component: REUQEST_PARAMS ,name : 'request-params'},
+    ]
+
+    const router = new VueRouter({
+        // 4. Provide the history implementation to use. We are using the hash history for simplicity here.
+        //history: VueRouter.createWebHashHistory(),
+        //mode:'history', //해쉬값 제거 방식
+        routes // short for `routes: routes`
+    })
+    //Vue.use(router);
     const app = new Vue({
         el: '#app',
+        router,
         data: {
             exTistoryID: 'nhj12311'
             , currentView : 'request-list'
-        },
-        components: {
-            'request-backup': httpVueLoader('./pages/request-backup.vue')
-            , 'request-list': httpVueLoader('./pages/request-list.vue')
-        },
+        },        
     })
+    
 </script>
 </body>
 </html>
