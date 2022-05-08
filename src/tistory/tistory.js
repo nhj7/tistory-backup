@@ -13,7 +13,7 @@ const path = require('path');
 
 require("dotenv").config();
 
-const htmlGen = require("./tistory/HTML_Generator.js")
+const htmlGen = require("./HTML_Generator.js")
 
 function sleep(t){
     console.log(t+"ms sleep.");
