@@ -10,13 +10,18 @@ fastify.register(fastifyStatic, {
 })
 
 fastify.register(fastifyStatic, {
-root: path.join(__dirname, '../../target/'),
-prefix: '/target/',
-decorateReply: false // the reply decorator has been added by the first plugin registration
+    root: path.join(__dirname, '../../target/'),
+    prefix: '/target/',
+    decorateReply: false // the reply decorator has been added by the first plugin registration
 })
 
-fastify.get('/api/requestBackup', function (req, reply) {
-    return `echo requestBackup` // sending path.join(__dirname, 'public', 'myHtml.html') directly with custom filename
+const db = require("./db.js")
+
+fastify.get('/api/request-backup', async function (req, reply) {
+    const backReqQry = `select 1 as cnt`
+    const result = await db.pool.query(backReqQry);
+    console.log(result, req);
+    return `echo request-backup` // sending path.join(__dirname, 'public', 'myHtml.html') directly with custom filename
 })
 
 fastify.get('/api/request-list', function (req, reply) {

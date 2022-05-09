@@ -43,7 +43,7 @@ async function writeFile(filePath, data) {
     }
 }
 
-(async (blogName) => {
+const tistoryBackup = async (blogName) => {
 
     // get tistory api access_token oauth 2.0
     let access_token = '';    
@@ -53,7 +53,10 @@ async function writeFile(filePath, data) {
         chromeOptions.addArguments('--headless');
 
         // 1. chromedriver 경로 설정 // chromedriver가 있는 경로를 입력 
-        const service = new chrome.ServiceBuilder('./chromedriver/win32/chromedriver.exe').build(); 
+        
+        const service = new chrome.ServiceBuilder( 
+            process.platform === "win32" ? 
+            './chromedriver/win32/chromedriver.exe' : './chromedriver/linux64/chromedriver' ).build(); 
         chrome.setDefaultService(service);     
         // 2. chrome 브라우저 빌드 
         const driver = await new webdriver.Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
@@ -299,4 +302,10 @@ ${markdown}
     
 
     console.log("debugger");
-})('nhj12311');
+};
+
+//tistoryBackup("nhj12311");
+
+module.exports = {
+    backupTistoryBlog : tistoryBackup
+}
