@@ -1,14 +1,14 @@
 //ecosystem.config.js
 const config = {
     apps: [{
-      name: 'tistory-backup-web',
+      name: 'tb-web',
       script: './src/server/',
       // script: './node_modules/nuxt/bin/nuxt.js',
       // args: 'start',
       // script: 'nuxt',
       // args : 'start',
       //instances: 'max',
-      instances: 0,
+      instances: 1,
       exec_mode: 'fork',
       //wait_ready: true,
       //listen_timeout: 3000,    
@@ -18,14 +18,14 @@ const config = {
         //"httpsPort": 4443,
       }
     }, {
-      name: 'tistory-backup-batch',
+      name: 'tb-batch',
       script: './src/batch/',
       // script: './node_modules/nuxt/bin/nuxt.js',
       // args: 'start',
       // script: 'nuxt',
       // args : 'start',
       //instances: 'max',
-      instances: 0,
+      instances: 1,
       exec_mode: 'fork',
       //wait_ready: true,
       //listen_timeout: 3000,
