@@ -189,9 +189,9 @@ const tistoryBackup = async (blogName) => {
     for( const [ idx, post]  of tistoryPosts.entries()){
         console.log(idx,post);
 
-        if( categoryMap.get(post.categoryId).label.indexOf("dev") == -1){
-            continue;
-        }
+        // if( categoryMap.get(post.categoryId).label.indexOf("dev") == -1){
+        //     continue;
+        // }
 
         const categoryName = categoryMap.get(post.categoryId)?.name || '없음';
         const parentCategoryName = categoryMap.get(categoryMap.get(post.categoryId)?.parent)?.name || '';
@@ -297,14 +297,17 @@ ${markdown}
     } // end for( const [ idx, post]  of tistoryPosts.entries()){ 
     
     
-
+    const zipPath = `./target/${blogName}/`
+    const zipTargetPath = `./target/${blogName}.zip`
+    const archiver = require("./archiver.js");
+    await archiver.zipDirectory(zipPath, zipTargetPath);
     
     
 
     console.log("debugger");
 };
 
-//tistoryBackup("nhj12311");
+//tistoryBackup("gaiq-exam");
 
 module.exports = {
     backupTistoryBlog : tistoryBackup

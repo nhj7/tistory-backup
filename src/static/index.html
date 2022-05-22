@@ -8,21 +8,94 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style>
-        
+    .floating1 {
+        animation-name: floating1;
+        animation-duration: .8s;
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+        margin-right:55px;
+            top:50%;
+            left:45%;
+            height: .75em;
+            width: .75em;
+            position:fixed;
+            cursor:pointer;
+            border-radius:75px;
+            background-color:blue;
+            transition: background-color 0.3s ease;
+            -webkit-transition: background-color 2s ease-out;
+        -moz-transition: background-color 2s ease-out;
+        -o-transition: background-color 2s ease-out;
+    }
+    .floating2 {
+        animation-name: floating2;
+            animation-delay : .2s;
+        animation-duration: .8s;
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+        margin-right:55px;
+            top:50%;
+            left:52%;
+            height: .75em;
+            width: .75em;
+            position:fixed;
+            cursor:pointer;
+            border-radius:75px;
+            background-color:blue;
+            transition: background-color 0.3s ease;
+            -webkit-transition: background-color 2s ease-out;
+        -moz-transition: background-color 2s ease-out;
+        -o-transition: background-color 2s ease-out;
+    }
+    .floating3 {
+        animation-name: floating3;
+            animation-delay : .4s;
+        animation-duration: .8s;
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+        margin-right:55px;
+            top:50%;
+            left:59%;
+            height: .75em;
+            width: .75em;
+            position:fixed;
+            cursor:pointer;
+            border-radius:75px;
+            background-color:blue;
+            transition: background-color 0.3s ease;
+            -webkit-transition: background-color 2s ease-out;
+        -moz-transition: background-color 2s ease-out;
+        -o-transition: background-color 2s ease-out;
+    }
+    @keyframes floating1 {
+        from { transform: translate(0,  0px); background-color:skyblue;}
+        65%  { transform: translate(0, -20px);background-color:blue;}
+        to   { transform: translate(0, -0px); background-color:skyblue;}
+    }
+    @keyframes floating2 {
+        from { transform: translate(0,  0px); background-color:skyblue;}
+        65%  { transform: translate(0, -20px);background-color:blue;}
+        to   { transform: translate(0, -0px); background-color:skyblue;}
+    }
+    @keyframes floating3 {
+        from { transform: translate(0,  0px); background-color:skyblue;}
+        65%  { transform: translate(0, -20px);background-color:blue;}
+        to   { transform: translate(0, -0px); background-color:skyblue;}
+    }
     </style>
 </head>
 <body>
 <div id="app">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav id="nav" class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Tistory Backup</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" >
             <li class="nav-item">
-                <router-link class="nav-link active" to="/">Home </router-link>
+                <router-link class="nav-link active" to="/" >Home </router-link>
             </li>
             <li class="nav-item">
                 <router-link class="nav-link active" to="/request-backup">백업요청</router-link>
@@ -68,8 +141,17 @@
 </div> <!--<div class="container"> -->
 
     <br /><br /><br />
-    <router-link to="/">Go to Home {{exTistoryID}} </router-link>
+    <!--router-link to="/">Go to Home {{exTistoryID}} </router-link-->
 
+<div id="progressModal" ref="progressModal" tabindex="-1" v-show="$store.state.progressModal">
+    <div >
+        <div id="" class="floating1" ></div>
+        <div id="" class="floating2" ></div>
+        <div id="" class="floating3" ></div>
+    </div>    
+</div>
+
+    
 
 </div> <!--<div id="app"> -->
 
@@ -86,12 +168,20 @@
     ReactDOM.render(<h4>백업하고 싶은 티스토리 아이디와 받고 싶은 메일 주소를 적어주세요 🚀</h4>, app);
 </script-->
 <!-- 상용버전, 속도와 용량이 최적화됨. -->
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
-<script src="https://unpkg.com/http-vue-loader"></script>
-<script src="https://unpkg.com/vue-router@3"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script-->
+<script src="https://unpkg.com/vue@2.6.14"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/http-vue-loader@1.4.2/src/httpVueLoader.min.js"></script>
+<script src="https://unpkg.com/vue-router@3.5.3/dist/vue-router.min.js"></script>
+<script src="https://unpkg.com/vee-validate@2.2.15/dist/vee-validate.min.js"></script>
+<script src="https://unpkg.com/vuex@2.5.0/dist/vuex.min.js"></script>
+<script src="https://unpkg.com/dayjs@1.8.21/dayjs.min.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/vue-dayjs@1.0.2/index.min.js"></script-->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+
+
+
     // 1. Define route components.
     // These can be imported from other files
     
@@ -113,15 +203,86 @@
         //mode:'history', //해쉬값 제거 방식
         routes // short for `routes: routes`
     })
-    //Vue.use(router);
+
+    const dict = {
+        kr: {
+            messages:{
+                required: (val) => `${val}을(를) 입력해주세요. `
+                , alpha_dash: (val) => `${val}는 영문자와 대시로만 입력해주세요. `
+                , confirmed : (val1, val2) => `${val1}는 ${val2}와 동일하게 입력해주세요. `
+                , email : (val) => `${val}은 메일 주소 형식에 맞게 입력해주세요.`
+            }
+        }
+    };   
+
+    Vue.use(VeeValidate, { locale: 'kr', dictionary :dict  });
+    Vue.prototype.$dayjs = dayjs;
+    
+    //VeeValidate.localize('ko');
+    const store = new Vuex.Store({
+        state: {
+            dataAll: {},
+            currentPost: {},
+            count: 0,
+            progressModal : false
+        },
+        mutations: {
+            SET_CURRENT_POST: function(state, id) {
+            let post = state.dataAll.find(data => data.id === id)
+            state.currentPost = post
+            }, 
+            increment (state) {
+                state.count++
+            }
+        }
+    });
+
+    
+
     const app = new Vue({
         el: '#app',
         router,
+        store,
+        
         data: {
             exTistoryID: 'nhj12311'
             , currentView : 'request-list'
-        },        
-    })
+            , progressModal : false
+        },
+        watch : {
+            '$store.state.progressModal' : {
+                handler(val){
+                    console.log('progressModal', val);
+                    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'))
+                    if( val == true){
+                        //progressModal.toggle();
+                    }else{
+                        //debugger;
+                        //progressModal.toggle();
+                    }
+                    
+                }
+            }
+        }, mounted (){
+            const navLinks = document.querySelectorAll('.nav-item')
+            const menuToggle = document.getElementById('navbarSupportedContent')
+            const bsCollapse = new bootstrap.Collapse(menuToggle, {toggle:false})
+            navLinks.forEach((l) => {
+                //console.log(111, l);
+                l.addEventListener('click', () => {bsCollapse.toggle() })
+            })
+        }        
+    });
+
+    //Vue.use(Vuex);
+    
+    
+    //Vue.use(store);
+
+    //app.use(store);
+    
+    //app.$validator.localize('kr',dictionary);
+    
     
 </script>
 </body>

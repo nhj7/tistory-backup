@@ -11,11 +11,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(request, idx) in requestList" v-bind:key="request.id">
+        <tr v-for="(request, idx) in requestList" v-bind:key="request.SEQ">
           <th scope="row">{{idx+1}}</th>
-          <td>{{request.id}}</td>
-          <td>{{request.date | date}}</td>
-          <td><i class="bi text-primary" :class="['bi-'+statusMap[request.status].icon]"></i> {{statusMap[request.status].name}}</td>
+          <td>
+            <div v-if="request.REQ_STATUS==7"><a :href="`/target/${request.ID}/`" target="_blank">{{request.ID}}</a></div>
+            <div v-else>{{request.ID}}</div>
+          </td>
+          <td data-toggle="tooltip" data-placement="top" :title="`${$dayjs(request.REQ_DATE).format('YYYY-MM-DD HH:mm')}`">{{ $dayjs(request.REQ_DATE).format('YYYY-MM-DD')}}</td>
+          <td><i class="bi" :class="['bi-'+statusMap[request.REQ_STATUS].icon, 'text-'+statusMap[request.REQ_STATUS].color ]"></i> {{statusMap[request.REQ_STATUS].name}}</td>
         </tr>
       </tbody>
     </table>
@@ -24,17 +27,15 @@
 
 <script>
 
-const data = {
+var data = {
   id : 'request-list'
-  , requestList : [
-    { id : 'nhj7', date : '20220509', status:'0'}
-    , { id : 'Jacob', date : '20220508', status:'3'}
-    , { id : 'nhj12311', date : '20220507', status:'7'}
-  ]
+  , list : { }
+  , requestList : []
   , statusMap : {
-    0 : { name : '대기중', icon : 'hourglass'}
-    , 3 : { name : '백업중', icon : 'hourglass-split'}
-    , 7 : { name : '완료', icon : 'check-circle'}
+    0 : { name : '대기중', icon : 'hourglass', color : 'secondary'}
+    , 3 : { name : '백업중', icon : 'hourglass-split', color : 'primary'}
+    , 7 : { name : '완료', icon : 'check-circle' , color : 'success'}
+    , 9 : { name : '실패', icon : 'exclamation-circle' , color : 'danger'}
   }
 };
 
@@ -44,30 +45,39 @@ module.exports = {
     return data
   },
   computed: {
-    hasResult: function () {
-      return this.posts.length > 0
-    }
+    
   }
   ,methods: {
     getRequestList : async () => { getRequestList(); }
   }
-  ,created: function() {
-    getRequestList();
+  ,async created() {
+    console.log("axios",axios);
+    const result = await axios.get("/api/request-list");
+    this.requestList = result.data.list;
+    // result.data.list.forEach((el,idx) => {
+    //   //this.requestList.push(el);  
+    //   Vue.set(this.requestList, idx, el);
+      
+    // });
+    
+    
+    //this.$set("requestList", result.data.list)
+    
+    //this.$set(this.requestList, result.data.list)
+    
+    console.log("axios", this.requestList);
+    //debugger;
+    //data.id="request-list2";
   }
   , mounted:function () {
   }, filters : {
     date : (val) => {
-      return val.replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3');
+      return val.replace(/(\d{4})(\d{2})(\d{2})(\d{2})/g, '$1-$2-$3 $4');
     }
   }
 }
 
-const getRequestList = async() => {
-  console.log("axios",axios);
-  const result = await axios.get("/api/request-list");
-  console.log("axios",result);
-  data.id="request-list2";
-}
+
 </script>
 
 <style>
