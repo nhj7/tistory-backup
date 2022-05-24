@@ -55,6 +55,7 @@ fastify.get('/api/request-list', async (req, reply) => {
 
 // Run the server!
 const start = async () => {
+    console.log("...");
     try {
         await fastify.listen( process.env.WEB_PORT || 3000, '0.0.0.0' )
     } catch (err) {

@@ -8,6 +8,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <style>
+    .router-link-exact-active{
+        color : white !important;
+    }
+
     .floating1 {
         animation-name: floating1;
         animation-duration: .8s;
@@ -84,27 +88,28 @@
     }
     </style>
 </head>
-<body>
+<body style="padding-top:4em;">
 <div id="app">
-<nav id="nav" class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+<nav id="nav" class="navbar navbar-expand-md navbar-dark bg-dark navbar-default fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Tistory Backup</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button id="navbarToggler" ref="navbarToggler" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse " id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0" >
             <li class="nav-item">
-                <router-link class="nav-link active" to="/" >Home </router-link>
+                <router-link class="nav-link" to="/" >Home </router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link active" to="/request-backup">백업요청</router-link>
+                <router-link class="nav-link " to="/request-backup" >백업요청</router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link active" to="/request-id/123">동적 라우터 예제</router-link>
+                <router-link class="nav-link " to="/request-id/123" >동적 라우터 예제</router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link active" :to="{name: 'request-params', params: {name: 'dog', age:4}}">파라미터 예제</router-link>
+                <router-link class="nav-link " :to="{name: 'request-params', params: {name: 'dog', age:4}}">파라미터 예제</router-link>
             </li>
 
             <!--li class="nav-item">
@@ -264,13 +269,40 @@
                 }
             }
         }, mounted (){
-            const navLinks = document.querySelectorAll('.nav-item')
+
+            const navLinks = document.querySelectorAll('.nav-link')
             const menuToggle = document.getElementById('navbarSupportedContent')
+            const navbarToggler = document.getElementById('navbarToggler')
+            
+
             const bsCollapse = new bootstrap.Collapse(menuToggle, {toggle:false})
             navLinks.forEach((l) => {
                 //console.log(111, l);
-                l.addEventListener('click', () => {bsCollapse.toggle() })
+                l.addEventListener('click', () => {
+
+                    // navLinks.forEach((nl) => {
+                    //     //debugger;
+                    //     nl.classList.remove("active")
+                    // });
+                    // console.log(l);
+                    // l.classList.add("active");
+
+                    // if (!window.matchMedia('(min-width: 768px)').matches) {
+                    //     bsCollapse.toggle() 
+                    // }
+
+                    const style1 = getComputedStyle(navbarToggler);
+                    if( style1.getPropertyValue("display") != 'none'){
+                        bsCollapse.toggle() 
+                    }
+                    //debugger;
+
+                    
+                    
+                })
             })
+
+
         }        
     });
 

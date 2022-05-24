@@ -18,7 +18,7 @@ cron.schedule('0 */1 */1 * * *', async () => {
             return;
         }
         isRunning = true;
-        const reqSelQry = `select * from T_BACKUP_REQ where req_status = 0 order by seq asc limit 1`;
+        const reqSelQry = `select * from T_BACKUP_REQ where req_status = 1 order by seq asc limit 1`;
         const reqSelResult = await db.pool.query(reqSelQry);
         console.log('reqSelResult', reqSelResult);
         if( reqSelResult && reqSelResult.length > 0 )

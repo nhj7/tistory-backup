@@ -242,7 +242,15 @@ const tistoryBackup = async (blogName) => {
                 // console.log(i, el, path.extname(el.attribs.src),resImg);
                 const imgFileName = `./${i}${path.extname(el.attribs.src)}`;
                 // await writeFile(`./target/${imgFileName}`, resImg.data);
-        
+                try {
+                    $(el).parent().next()[0].children[0].data = `[이미지 - ${imgFileName}]`
+                } catch (error) {
+                    console.error("image caption error", error);
+                }
+                    
+                //console.log($(el).parent().nextSibling);
+
+                $(el).attr('alt', `이미지 - ${imgFileName}`)
                 return $(el).attr('src', `${imgFileName}`)
             });
         }
@@ -294,6 +302,8 @@ ${markdown}
         //$("body").prepend(`<p><h4 style='text-align:center;' >#${categoryName}</h4> <h1 style='text-align:center;'> ${post.title} </h1> </center> </p> <p style='text-align:right;' > ${post.date} </p> <br /> <hr /> <br />`)
 
         await writeFile(htmlFileName,$.html());
+        await writeFile(`${filePath}/${post.title.replace(/[/\\?%*:|"<>]/g, '-')}.txt`,$.text());
+
     } // end for( const [ idx, post]  of tistoryPosts.entries()){ 
     
     
@@ -307,7 +317,7 @@ ${markdown}
     console.log("debugger");
 };
 
-//tistoryBackup("gaiq-exam");
+tistoryBackup("gaiq-exam");
 
 module.exports = {
     backupTistoryBlog : tistoryBackup

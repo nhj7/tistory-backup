@@ -62,9 +62,9 @@
     exTistoryID : 'nhj12311'
     , modal : false
     , reqBakObj : {
-      id : 'nhj12311'
-      , idChk : 'nhj12311'
-      , email : 'nhj12311@gmail.com'
+      id : ''
+      , idChk : ''
+      , email : ''
       , agree : false
     }
   }

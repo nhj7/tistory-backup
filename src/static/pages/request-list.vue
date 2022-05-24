@@ -32,7 +32,8 @@ var data = {
   , list : { }
   , requestList : []
   , statusMap : {
-    0 : { name : '대기중', icon : 'hourglass', color : 'secondary'}
+    0 : { name : '접수대기', icon : 'hourglass', color : 'secondary'}
+    , 1 : { name : '접수완료', icon : 'hourglass', color : 'secondary'}
     , 3 : { name : '백업중', icon : 'hourglass-split', color : 'primary'}
     , 7 : { name : '완료', icon : 'check-circle' , color : 'success'}
     , 9 : { name : '실패', icon : 'exclamation-circle' , color : 'danger'}
