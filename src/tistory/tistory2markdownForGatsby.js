@@ -132,9 +132,9 @@ async function writeFile(filePath, data) {
     for( const [ idx, post]  of tistoryPosts.entries()){
         console.log(idx,post);
 
-        // if( categoryMap.get(post.categoryId).label.indexOf("dev") == -1){
-        //     continue;
-        // }
+        if( categoryMap.get(post.categoryId).label.indexOf("dev") == -1){
+            continue;
+        }
 
         const categoryName = categoryMap.get(post.categoryId)?.name || '없음';
         const parentCategoryName = categoryMap.get(categoryMap.get(post.categoryId)?.parent)?.name || '';
